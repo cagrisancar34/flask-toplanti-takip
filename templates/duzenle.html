@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Gündem Düzenle</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    label { display: inline-block; width: 120px; }
+    input, select { width: 300px; padding: 5px; }
+    button { padding: 8px 12px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Gündem Maddesi Düzenle</h2>
+  <form method="POST">
+    <label>Konu:</label>
+    <input type="text" name="konu" value="{{ veri['Konu'] }}" required><br><br>
+
+    <label>Karar:</label>
+    <input type="text" name="karar" value="{{ veri['Karar'] }}"><br><br>
+
+    <label>Durum:</label>
+    <select name="durum">
+      <option value="Devam Ediyor" {% if veri['Durum'] == 'Devam Ediyor' %}selected{% endif %}>Devam Ediyor</option>
+      <option value="Tamamlandı" {% if veri['Durum'] == 'Tamamlandı' %}selected{% endif %}>Tamamlandı</option>
+      <option value="Beklemede" {% if veri['Durum'] == 'Beklemede' %}selected{% endif %}>Beklemede</option>
+      <option value="İptal Edildi" {% if veri['Durum'] == 'İptal Edildi' %}selected{% endif %}>İptal Edildi</option>
+    </select><br><br>
+
+    <label>Termin:</label>
+    <input type="date" name="termin" value="{{ veri['Termin'] }}"><br><br>
+
+    <label>Eylem Öğeleri:</label>
+    <input type="text" name="eylem" value="{{ veri['Eylem Öğeleri'] }}"><br><br>
+
+    <label>Sorumlu:</label>
+    <input type="text" name="sorumlu" value="{{ veri['Sorumlu'] }}" required><br><br>
+
+    <button type="submit">Kaydet</button>
+    <a href="{{ url_for('index') }}"><button type="button">İptal</button></a>
+  </form>
+</body>
+</html>

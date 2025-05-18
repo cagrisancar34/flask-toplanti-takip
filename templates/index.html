@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Toplantı Takip</title>
+  <style>
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+    tr.devam_ediyor { background-color: #FFEB9C; }
+    tr.tamamlandi { background-color: #C6EFCE; }
+    tr.iptal_edildi { background-color: #FFC7CE; }
+    tr.beklemede { background-color: #9DC3E6; }
+    button { margin-right: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Toplantı Takip</h1>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul style="color: green;">
+        {% for msg in messages %}
+          <li>{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <p>
+    {% if toplanti.aktif %}
+      🟢 Aktif Toplantı: {{ toplanti.tarih }}
+      <a href="{{ url_for('bitir') }}"><button>Toplantıyı Bitir</button></a>
+    {% else %}
+      🔴 Aktif Toplantı Yok
+      <a href="{{ url_for('baslat') }}"><button>Toplantıyı Başlat</button></a>
+    {% endif %}
+  </p>
+
+  <h2>Filtrele</h2>
+  <form method="GET">
+    <label>Tarih:</label>
+    <input type="date" name="tarih" value="{{ filtre.tarih }}"><br><br>
+
+    <label>Durum:</label>
+    <select name="durum">
+      <option value="">Tümü</option>
+      <option value="Devam Ediyor" {% if filtre.durum == 'Devam Ediyor' %}selected{% endif %}>Devam Ediyor</option>
+      <option value="Tamamlandı" {% if filtre.durum == 'Tamamlandı' %}selected{% endif %}>Tamamlandı</option>
+      <option value="Beklemede" {% if filtre.durum == 'Beklemede' %}selected{% endif %}>Beklemede</option>
+      <option value="İptal Edildi" {% if filtre.durum == 'İptal Edildi' %}selected{% endif %}>İptal Edildi</option>
+    </select><br><br>
+
+    <label>Sorumlu:</label>
+    <select name="sorumlu">
+      <option value="">Tümü</option>
+      {% for kisi in sorumlular %}
+        <option value="{{ kisi }}" {% if filtre.sorumlu == kisi %}selected{% endif %}>{{ kisi }}</option>
+      {% endfor %}
+    </select><br><br>
+
+    <button type="submit">Filtrele</button>
+    <a href="{{ url_for('index') }}"><button type="button">Temizle</button></a>
+  </form>
+
+  <h2>Canlı Arama</h2>
+  <input type="text" id="aramaInput" placeholder="Ara..." style="width: 300px; padding: 6px;">
+
+  {% if toplanti.aktif %}
+  <h2>Yeni Gündem Ekle</h2>
+  <form method="POST">
+    <label>Konu:</label><input type="text" name="konu" required><br><br>
+    <label>Karar:</label><input type="text" name="karar"><br><br>
+    <label>Durum:</label>
+    <select name="durum">
+      <option>Devam Ediyor</option>
+      <option>Tamamlandı</option>
+      <option>Beklemede</option>
+      <option>İptal Edildi</option>
+    </select><br><br>
+    <label>Termin:</label><input type="date" name="termin" required><br><br>
+    <label>Eylem Öğeleri:</label><input type="text" name="eylem"><br><br>
+    <label>Sorumlu:</label><input type="text" name="sorumlu" required><br><br>
+    <button type="submit">Ekle</button>
+  </form>
+  {% endif %}
+
+  <h2>Gündem Listesi</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Toplantı Tarihi</th>
+        <th>Konu</th>
+        <th>Karar</th>
+        <th>Durum</th>
+        <th>Termin</th>
+        <th>Eylem Öğeleri</th>
+        <th>Sorumlu</th>
+        <th>İşlem</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in gundemler %}
+      <tr class="{{ item.durum_class }}">
+        <td>{{ item.id }}</td>
+        <td>{{ item.toplanti_tarihi }}</td>
+        <td>{{ item.konu }}</td>
+        <td>{{ item.karar }}</td>
+        <td>{{ item.durum }}</td>
+        <td>{{ item.termin }}</td>
+        <td>{{ item.eylem }}</td>
+        <td>{{ item.sorumlu }}</td>
+        <td>
+          <a href="{{ url_for('duzenle', id=item.id) }}"><button>Düzenle</button></a>
+          <a href="{{ url_for('sil', id=item.id) }}" onclick="return confirm('Silmek istediğinizden emin misiniz?');"><button>Sil</button></a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+<script>
+  const input = document.getElementById("aramaInput");
+  input.addEventListener("keyup", function () {
+    const filtre = input.value.toLowerCase();
+    const satirlar = document.querySelectorAll("tbody tr");
+    satirlar.forEach(function (satir) {
+      const metin = satir.textContent.toLowerCase();
+      satir.style.display = metin.includes(filtre) ? "" : "none";
+    });
+  });
+</script>
+
+</body>
+</html>

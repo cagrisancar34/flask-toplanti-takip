@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Excel Yükle</title>
+</head>
+<body>
+  <h1>Excel Yükle</h1>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul style="color: red;">
+        {% for msg in messages %}
+          <li>{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" required accept=".xls,.xlsx">
+    <button type="submit">Yükle</button>
+  </form>
+
+  <br><a href="{{ url_for('index') }}">Ana Sayfaya Dön</a>
+</body>
+</html>
